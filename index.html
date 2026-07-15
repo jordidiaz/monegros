@@ -344,6 +344,28 @@
     color: var(--muted);
     letter-spacing: 0.02em;
   }
+  .itin-remove {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    padding: 6px 4px;
+    margin-left: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+  }
+  .itin-remove:hover { color: var(--heart); }
+  .itin-clear {
+    display: block;
+    margin: 16px auto 4px;
+  }
 
   @media (min-width: 640px) {
     footer { padding: 20px 20px 0; font-size: 10.5px; letter-spacing: 0.04em; }
@@ -892,13 +914,16 @@
       var name = el.getAttribute('data-name');
       var time = el.getAttribute('data-time');
       var color = el.getAttribute('data-color');
+      var id = el.getAttribute('data-id');
       html += '<div class="itin-row">' +
                 '<span class="itin-time">' + time + '</span>' +
                 '<span class="itin-dot" style="background:' + color + '"></span>' +
                 '<span class="itin-info"><span class="itin-name">' + name + '</span>' +
                 '<span class="itin-stage">' + stage + '</span></span>' +
+                '<button class="itin-remove" aria-label="Quitar" onclick="removeFav(\'' + id + '\')">&times;</button>' +
               '</div>';
     });
+    html += '<button class="itin-clear reset-btn" onclick="clearItinerary()">Borrar itinerario</button>';
     listEl.innerHTML = html;
   }
 
@@ -911,6 +936,26 @@
     var favs = loadFavs();
     if (!favs) favs = {};
     favs[id] = newState;
+    saveFavs(favs);
+    renderItinerary();
+  }
+
+  function removeFav(id) {
+    var el = document.querySelector('.event[data-id="' + id + '"]');
+    if (el) applyState(el, false);
+    var favs = loadFavs() || {};
+    favs[id] = false;
+    saveFavs(favs);
+    renderItinerary();
+  }
+
+  function clearItinerary() {
+    if (!confirm('¿Borrar todo el itinerario?')) return;
+    var favs = loadFavs() || {};
+    document.querySelectorAll('.event.liked').forEach(function(el) {
+      applyState(el, false);
+      favs[el.getAttribute('data-id')] = false;
+    });
     saveFavs(favs);
     renderItinerary();
   }
