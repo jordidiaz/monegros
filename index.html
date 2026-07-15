@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monegros Desert Festival — 25 Julio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0C10;
+    --panel: #15171C;
+    --panel-2: #1B1E24;
+    --text: #F5F1E8;
+    --muted: #8A8F98;
+    --line: #2A2E36;
+    --heart: #F2545B;
+    --label-col: 108px;
+    --col-w: 46px;
+    --row-h: 60px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 100%;
+    padding: 20px 0 70px;
+  }
+  header {
+    padding: 0 16px 18px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+    line-height: 1.08;
+  }
+  h1 span { color: #E8B86D; }
+  .sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .legend {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .legend .heart { color: var(--heart); }
+  .reset-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+    min-height: 36px;
+  }
+  .reset-btn:hover {
+    color: var(--heart);
+    border-color: var(--heart);
+  }
+
+  @media (min-width: 640px) {
+    :root { --label-col: 168px; --col-w: 50px; --row-h: 64px; }
+    .wrap { padding: 28px 0 60px; }
+    header { padding: 0 20px 22px; }
+    .eyebrow { font-size: 11px; letter-spacing: 0.18em; margin-bottom: 10px; }
+    h1 { font-size: clamp(28px, 4vw, 44px); margin: 0 0 6px; }
+    .sub { font-size: 12.5px; flex-direction: row; flex-wrap: wrap; gap: 4px 18px; align-items: center; }
+  }
+
+  .scroll-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    padding: 10px 16px 0;
+    letter-spacing: 0.04em;
+  }
+
+  .scroller {
+    overflow-x: auto;
+    padding: 14px 0 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: var(--label-col) 1fr;
+    min-width: calc(var(--label-col) + 88 * var(--col-w) + 20px);
+    padding: 0 16px 0 0;
+  }
+
+  .corner {
+    position: sticky; left: 0; z-index: 5;
+    background: var(--bg);
+  }
+  .phase-row {
+    display: grid;
+    grid-template-columns: repeat(88, minmax(var(--col-w),1fr));
+    margin-left: 16px;
+  }
+  .phase {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: #0B0C10;
+    background: var(--phase-color);
+    opacity: 0.88;
+    text-align: center;
+    padding: 4px 0;
+    font-weight: 600;
+  }
+
+  .hour-row {
+    display: grid;
+    grid-template-columns: repeat(88, minmax(var(--col-w),1fr));
+    margin-left: 16px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+  }
+  .tick {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    padding-top: 8px;
+    border-left: 1px solid var(--line);
+    padding-left: 5px;
+  }
+  .tick-sub { color: var(--muted); font-size: 8.5px; margin-left: 1px; }
+
+  @media (min-width: 640px) {
+    .phase-row, .hour-row { margin-left: 20px; }
+    .phase { font-size: 10px; letter-spacing: 0.14em; }
+    .tick { font-size: 12px; padding-left: 6px; }
+    .tick-sub { font-size: 9px; }
+  }
+
+  .stage-label {
+    position: sticky; left: 0; z-index: 4;
+    background: var(--bg);
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    color: var(--text);
+    padding: 10px 8px 10px 14px;
+    border-right: 1px solid var(--line);
+    min-height: var(--row-h);
+    line-height: 1.2;
+  }
+  .stage-label .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--stage-color);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.05);
+  }
+
+  @media (min-width: 640px) {
+    .stage-label { font-size: 12px; letter-spacing: 0.06em; padding: 14px 14px 14px 20px; gap: 8px; }
+    .stage-label .dot { width: 9px; height: 9px; }
+  }
+
+  .track {
+    position: relative;
+    display: grid;
+    min-height: var(--row-h);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+    background-image: linear-gradient(to right, var(--line) 1px, transparent 1px);
+    background-size: calc(100% / 22) 100%;
+  }
+
+  .event {
+    grid-row: 1;
+    margin: 2px 3px;
+    background: color-mix(in srgb, var(--stage-color) 22%, var(--panel-2));
+    border-left: 3px solid var(--stage-color);
+    border-radius: 3px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    overflow: hidden;
+    min-width: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  .event:hover {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--stage-color) 60%, transparent);
+  }
+  .event:active {
+    transform: scale(0.97);
+  }
+  .event.tiny { padding: 4px 6px; }
+  .event.liked {
+    background: color-mix(in srgb, var(--heart) 28%, var(--panel-2));
+    border-left: 3px solid var(--heart);
+    box-shadow: 0 0 0 1px rgba(242,84,91,0.35);
+  }
+  .ev-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .heart { color: var(--heart); margin-right: 3px; }
+  .ev-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .event.tiny .ev-time { display: none; }
+  .event.tiny .ev-name { font-size: 11px; }
+
+  footer {
+    padding: 16px 16px 90px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+
+  .itinerary-panel {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.4);
+    max-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    transition: max-height 0.2s ease;
+  }
+  .itinerary-panel.collapsed {
+    max-height: 52px;
+  }
+  .itinerary-panel.collapsed .itinerary-chevron {
+    transform: rotate(180deg);
+  }
+  .itinerary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+    min-height: 52px;
+  }
+  .itinerary-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .itinerary-title .heart { color: var(--heart); }
+  .itinerary-chevron {
+    color: var(--muted);
+    font-size: 11px;
+    transition: transform 0.2s ease;
+  }
+  .itinerary-list {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 16px 20px;
+    border-top: 1px solid var(--line);
+  }
+  .itin-empty {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 16px 0;
+    line-height: 1.5;
+  }
+  .itin-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    min-height: 44px;
+  }
+  .itin-row:last-child { border-bottom: none; }
+  .itin-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text);
+    min-width: 84px;
+    flex-shrink: 0;
+  }
+  .itin-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .itin-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .itin-name {
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .itin-stage {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  @media (min-width: 640px) {
+    footer { padding: 20px 20px 0; font-size: 10.5px; letter-spacing: 0.04em; }
+    .itinerary-header { padding: 14px 20px; }
+    .itinerary-title { font-size: 13px; letter-spacing: 0.04em; }
+    .itinerary-list { padding: 0 20px 20px; }
+    .itin-row { gap: 12px; padding: 11px 0; }
+    .itin-time { font-size: 12px; min-width: 92px; }
+    .itin-dot { width: 9px; height: 9px; }
+    .itin-name { font-size: 13.5px; }
+    .itin-stage { font-size: 10.5px; letter-spacing: 0.03em; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">MONEGROS DESERT FESTIVAL · SÁBADO 25 JULIO — DOMINGO 26 JULIO</div>
+    <h1>Todo el <span>lineup</span>, hora a hora.</h1>
+    <div class="sub">
+      <span>9 escenarios</span>
+      <span>14:00 → 12:00</span>
+      <span class="legend"><span class="heart">&#9829;</span> toca un set para marcarlo/desmarcarlo</span>
+      <button id="reset-btn" class="reset-btn" onclick="resetFavs()">Borrar favoritos</button>
+    </div>
+  </header>
+
+  <div class="scroll-hint">◀ DESLIZA HORIZONTALMENTE PARA VER TODAS LAS HORAS ▶</div>
+
+  <div class="scroller">
+    <div class="grid">
+      <div class="corner"></div>
+      <div class="phase-row">
+        <div class="phase" style="grid-column:1 / 21; --phase-color:#E8B86D;">TARDE</div><div class="phase" style="grid-column:21 / 29; --phase-color:#D9704F;">ATARDECER</div><div class="phase" style="grid-column:29 / 49; --phase-color:#2B3A55;">NOCHE</div><div class="phase" style="grid-column:49 / 69; --phase-color:#1B2333;">MADRUGADA</div><div class="phase" style="grid-column:69 / 81; --phase-color:#D98E4F;">AMANECER</div><div class="phase" style="grid-column:81 / 89; --phase-color:#E8B86D;">MAÑANA</div>
+      </div>
+
+      <div class="corner"></div>
+      <div class="hour-row">
+        <div class="tick" style="grid-column:1 / 5;">14<span class="tick-sub">h</span></div><div class="tick" style="grid-column:5 / 9;">15<span class="tick-sub">h</span></div><div class="tick" style="grid-column:9 / 13;">16<span class="tick-sub">h</span></div><div class="tick" style="grid-column:13 / 17;">17<span class="tick-sub">h</span></div><div class="tick" style="grid-column:17 / 21;">18<span class="tick-sub">h</span></div><div class="tick" style="grid-column:21 / 25;">19<span class="tick-sub">h</span></div><div class="tick" style="grid-column:25 / 29;">20<span class="tick-sub">h</span></div><div class="tick" style="grid-column:29 / 33;">21<span class="tick-sub">h</span></div><div class="tick" style="grid-column:33 / 37;">22<span class="tick-sub">h</span></div><div class="tick" style="grid-column:37 / 41;">23<span class="tick-sub">h</span></div><div class="tick" style="grid-column:41 / 45;">00<span class="tick-sub">h</span></div><div class="tick" style="grid-column:45 / 49;">01<span class="tick-sub">h</span></div><div class="tick" style="grid-column:49 / 53;">02<span class="tick-sub">h</span></div><div class="tick" style="grid-column:53 / 57;">03<span class="tick-sub">h</span></div><div class="tick" style="grid-column:57 / 61;">04<span class="tick-sub">h</span></div><div class="tick" style="grid-column:61 / 65;">05<span class="tick-sub">h</span></div><div class="tick" style="grid-column:65 / 69;">06<span class="tick-sub">h</span></div><div class="tick" style="grid-column:69 / 73;">07<span class="tick-sub">h</span></div><div class="tick" style="grid-column:73 / 77;">08<span class="tick-sub">h</span></div><div class="tick" style="grid-column:77 / 81;">09<span class="tick-sub">h</span></div><div class="tick" style="grid-column:81 / 85;">10<span class="tick-sub">h</span></div><div class="tick" style="grid-column:85 / 89;">11<span class="tick-sub">h</span></div><div class="tick" style="grid-column:89 / 93;">12<span class="tick-sub">h</span></div>
+      </div>
+
+      
+    <div class="stage-label" style="--stage-color:#E8B86D;"><span class="dot"></span>EL PAJAR</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s0-e0" data-default-liked="false" data-stage="EL PAJAR" data-name="MIILA" data-start="11.5" data-time="01:30–02:30" data-color="#E8B86D" style="grid-column:47 / 51; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>MIILA</span>
+          <span class="ev-time">01:30–02:30</span>
+        </div>
+        <div class="event" data-id="s0-e1" data-default-liked="false" data-stage="EL PAJAR" data-name="Desista" data-start="12.5" data-time="02:30–03:30" data-color="#E8B86D" style="grid-column:51 / 55; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Desista</span>
+          <span class="ev-time">02:30–03:30</span>
+        </div>
+        <div class="event" data-id="s0-e2" data-default-liked="false" data-stage="EL PAJAR" data-name="DJ Karpin" data-start="13.5" data-time="03:30–04:30" data-color="#E8B86D" style="grid-column:55 / 59; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>DJ Karpin</span>
+          <span class="ev-time">03:30–04:30</span>
+        </div>
+        <div class="event" data-id="s0-e3" data-default-liked="false" data-stage="EL PAJAR" data-name="Loop Stepwalker" data-start="14.5" data-time="04:30–05:30" data-color="#E8B86D" style="grid-column:59 / 63; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Loop Stepwalker</span>
+          <span class="ev-time">04:30–05:30</span>
+        </div>
+        <div class="event" data-id="s0-e4" data-default-liked="false" data-stage="EL PAJAR" data-name="Kursiva" data-start="15.5" data-time="05:30–06:30" data-color="#E8B86D" style="grid-column:63 / 67; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Kursiva</span>
+          <span class="ev-time">05:30–06:30</span>
+        </div>
+        <div class="event" data-id="s0-e5" data-default-liked="false" data-stage="EL PAJAR" data-name="Blan-K &amp; Nymfa" data-start="16.5" data-time="06:30–08:00" data-color="#E8B86D" style="grid-column:67 / 73; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Blan-K &amp; Nymfa</span>
+          <span class="ev-time">06:30–08:00</span>
+        </div>
+        <div class="event" data-id="s0-e6" data-default-liked="false" data-stage="EL PAJAR" data-name="Kevala" data-start="18" data-time="08:00–09:00" data-color="#E8B86D" style="grid-column:73 / 77; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Kevala</span>
+          <span class="ev-time">08:00–09:00</span>
+        </div>
+        <div class="event" data-id="s0-e7" data-default-liked="false" data-stage="EL PAJAR" data-name="Save The Rave" data-start="19" data-time="09:00–10:00" data-color="#E8B86D" style="grid-column:77 / 81; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Save The Rave</span>
+          <span class="ev-time">09:00–10:00</span>
+        </div>
+        <div class="event" data-id="s0-e8" data-default-liked="false" data-stage="EL PAJAR" data-name="Noppo" data-start="2" data-time="16:00–17:00" data-color="#E8B86D" style="grid-column:9 / 13; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Noppo</span>
+          <span class="ev-time">16:00–17:00</span>
+        </div>
+        <div class="event" data-id="s0-e9" data-default-liked="false" data-stage="EL PAJAR" data-name="Shaolin Dubz" data-start="3" data-time="17:00–18:00" data-color="#E8B86D" style="grid-column:13 / 17; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Shaolin Dubz</span>
+          <span class="ev-time">17:00–18:00</span>
+        </div>
+        <div class="event" data-id="s0-e10" data-default-liked="false" data-stage="EL PAJAR" data-name="OTO" data-start="4" data-time="18:00–20:00" data-color="#E8B86D" style="grid-column:17 / 25; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>OTO</span>
+          <span class="ev-time">18:00–20:00</span>
+        </div>
+        <div class="event" data-id="s0-e11" data-default-liked="false" data-stage="EL PAJAR" data-name="FBC" data-start="6" data-time="20:00–21:30" data-color="#E8B86D" style="grid-column:25 / 31; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>FBC</span>
+          <span class="ev-time">20:00–21:30</span>
+        </div>
+        <div class="event" data-id="s0-e12" data-default-liked="false" data-stage="EL PAJAR" data-name="Guau" data-start="7.5" data-time="21:30–22:30" data-color="#E8B86D" style="grid-column:31 / 35; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Guau</span>
+          <span class="ev-time">21:30–22:30</span>
+        </div>
+        <div class="event" data-id="s0-e13" data-default-liked="false" data-stage="EL PAJAR" data-name="Bitsune &amp; M&#x27;Go" data-start="8.5" data-time="22:30–00:00" data-color="#E8B86D" style="grid-column:35 / 41; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Bitsune &amp; M&#x27;Go</span>
+          <span class="ev-time">22:30–00:00</span>
+        </div>
+        <div class="event" data-id="s0-e14" data-default-liked="false" data-stage="EL PAJAR" data-name="Luca Syn &amp; GDS" data-start="10" data-time="00:00–01:30" data-color="#E8B86D" style="grid-column:41 / 47; --stage-color:#E8B86D;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Luca Syn &amp; GDS</span>
+          <span class="ev-time">00:00–01:30</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#C97B4A;"><span class="dot"></span>EL CORRAL</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s1-e0" data-default-liked="false" data-stage="EL CORRAL" data-name="Baum" data-start="2" data-time="16:00–17:30" data-color="#C97B4A" style="grid-column:9 / 15; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Baum</span>
+          <span class="ev-time">16:00–17:30</span>
+        </div>
+        <div class="event" data-id="s1-e1" data-default-liked="false" data-stage="EL CORRAL" data-name="Ion Pananides B2B Alex Pott" data-start="3.5" data-time="17:30–19:00" data-color="#C97B4A" style="grid-column:15 / 21; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Ion Pananides B2B Alex Pott</span>
+          <span class="ev-time">17:30–19:00</span>
+        </div>
+        <div class="event" data-id="s1-e2" data-default-liked="false" data-stage="EL CORRAL" data-name="Ella Knight" data-start="5" data-time="19:00–20:30" data-color="#C97B4A" style="grid-column:21 / 27; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Ella Knight</span>
+          <span class="ev-time">19:00–20:30</span>
+        </div>
+        <div class="event" data-id="s1-e3" data-default-liked="false" data-stage="EL CORRAL" data-name="Kirollus b2b Tonno Disko" data-start="6.5" data-time="20:30–22:30" data-color="#C97B4A" style="grid-column:27 / 35; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Kirollus b2b Tonno Disko</span>
+          <span class="ev-time">20:30–22:30</span>
+        </div>
+        <div class="event" data-id="s1-e4" data-default-liked="false" data-stage="EL CORRAL" data-name="Bárbara Boeing B2B Gee Lane" data-start="8.5" data-time="22:30–00:00" data-color="#C97B4A" style="grid-column:35 / 41; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Bárbara Boeing B2B Gee Lane</span>
+          <span class="ev-time">22:30–00:00</span>
+        </div>
+        <div class="event" data-id="s1-e5" data-default-liked="false" data-stage="EL CORRAL" data-name="Sally C" data-start="10" data-time="00:00–02:00" data-color="#C97B4A" style="grid-column:41 / 49; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Sally C</span>
+          <span class="ev-time">00:00–02:00</span>
+        </div>
+        <div class="event" data-id="s1-e6" data-default-liked="false" data-stage="EL CORRAL" data-name="Shonky b2b Alexander Skancke" data-start="12" data-time="02:00–04:00" data-color="#C97B4A" style="grid-column:49 / 57; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Shonky b2b Alexander Skancke</span>
+          <span class="ev-time">02:00–04:00</span>
+        </div>
+        <div class="event" data-id="s1-e7" data-default-liked="false" data-stage="EL CORRAL" data-name="Quest" data-start="14" data-time="04:00–06:00" data-color="#C97B4A" style="grid-column:57 / 65; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Quest</span>
+          <span class="ev-time">04:00–06:00</span>
+        </div>
+        <div class="event" data-id="s1-e8" data-default-liked="false" data-stage="EL CORRAL" data-name="Seth Troxler b2b Butch" data-start="16" data-time="06:00–10:00" data-color="#C97B4A" style="grid-column:65 / 81; --stage-color:#C97B4A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Seth Troxler b2b Butch</span>
+          <span class="ev-time">06:00–10:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#7FA9A0;"><span class="dot"></span>INDUSTRY CITY · 240 F2F</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s2-e0" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="Frederic. F2F BIXBITA" data-start="2" data-time="16:00–18:00" data-color="#7FA9A0" style="grid-column:9 / 17; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Frederic. F2F BIXBITA</span>
+          <span class="ev-time">16:00–18:00</span>
+        </div>
+        <div class="event" data-id="s2-e1" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="Paula Cazenave F2F Flug" data-start="4" data-time="18:00–19:30" data-color="#7FA9A0" style="grid-column:17 / 23; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Paula Cazenave F2F Flug</span>
+          <span class="ev-time">18:00–19:30</span>
+        </div>
+        <div class="event" data-id="s2-e2" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="SHDW F2F Alarico" data-start="5.5" data-time="19:30–21:30" data-color="#7FA9A0" style="grid-column:23 / 31; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>SHDW F2F Alarico</span>
+          <span class="ev-time">19:30–21:30</span>
+        </div>
+        <div class="event" data-id="s2-e3" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="fumi F2F Yanamaste" data-start="7.5" data-time="21:30–23:30" data-color="#7FA9A0" style="grid-column:31 / 39; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>fumi F2F Yanamaste</span>
+          <span class="ev-time">21:30–23:30</span>
+        </div>
+        <div class="event" data-id="s2-e4" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="MCR-T F2F Serafina" data-start="9.5" data-time="23:30–01:00" data-color="#7FA9A0" style="grid-column:39 / 45; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>MCR-T F2F Serafina</span>
+          <span class="ev-time">23:30–01:00</span>
+        </div>
+        <div class="event" data-id="s2-e5" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="Cloudy F2F Adrian Mills" data-start="11" data-time="01:00–02:30" data-color="#7FA9A0" style="grid-column:45 / 51; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Cloudy F2F Adrian Mills</span>
+          <span class="ev-time">01:00–02:30</span>
+        </div>
+        <div class="event" data-id="s2-e6" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="Peterblue F2F Noise Mafia" data-start="12.5" data-time="02:30–04:00" data-color="#7FA9A0" style="grid-column:51 / 57; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Peterblue F2F Noise Mafia</span>
+          <span class="ev-time">02:30–04:00</span>
+        </div>
+        <div class="event" data-id="s2-e7" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="GIØ F2F Zwilling F2F Dvaid" data-start="14" data-time="04:00–05:30" data-color="#7FA9A0" style="grid-column:57 / 63; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>GIØ F2F Zwilling F2F Dvaid</span>
+          <span class="ev-time">04:00–05:30</span>
+        </div>
+        <div class="event" data-id="s2-e8" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="Cleopard2000 F2F Mika Heggemann" data-start="15.5" data-time="05:30–07:00" data-color="#7FA9A0" style="grid-column:63 / 69; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Cleopard2000 F2F Mika Heggemann</span>
+          <span class="ev-time">05:30–07:00</span>
+        </div>
+        <div class="event" data-id="s2-e9" data-default-liked="false" data-stage="INDUSTRY CITY · 240 F2F" data-name="Andres Campo F2F Buenri" data-start="17" data-time="07:00–09:00" data-color="#7FA9A0" style="grid-column:69 / 77; --stage-color:#7FA9A0;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Andres Campo F2F Buenri</span>
+          <span class="ev-time">07:00–09:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#B37FC4;"><span class="dot"></span>ARTCORE</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s3-e0" data-default-liked="false" data-stage="ARTCORE" data-name="Antonio De Angelis" data-start="2" data-time="16:00–17:30" data-color="#B37FC4" style="grid-column:9 / 15; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Antonio De Angelis</span>
+          <span class="ev-time">16:00–17:30</span>
+        </div>
+        <div class="event" data-id="s3-e1" data-default-liked="false" data-stage="ARTCORE" data-name="Valentinø" data-start="3.5" data-time="17:30–19:00" data-color="#B37FC4" style="grid-column:15 / 21; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Valentinø</span>
+          <span class="ev-time">17:30–19:00</span>
+        </div>
+        <div class="event" data-id="s3-e2" data-default-liked="false" data-stage="ARTCORE" data-name="Elli Acula" data-start="5" data-time="19:00–20:30" data-color="#B37FC4" style="grid-column:21 / 27; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Elli Acula</span>
+          <span class="ev-time">19:00–20:30</span>
+        </div>
+        <div class="event" data-id="s3-e3" data-default-liked="false" data-stage="ARTCORE" data-name="Kink (Live)" data-start="6.5" data-time="20:30–22:00" data-color="#B37FC4" style="grid-column:27 / 33; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Kink (Live)</span>
+          <span class="ev-time">20:30–22:00</span>
+        </div>
+        <div class="event" data-id="s3-e4" data-default-liked="false" data-stage="ARTCORE" data-name="Astrix" data-start="8" data-time="22:00–23:30" data-color="#B37FC4" style="grid-column:33 / 39; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Astrix</span>
+          <span class="ev-time">22:00–23:30</span>
+        </div>
+        <div class="event" data-id="s3-e5" data-default-liked="false" data-stage="ARTCORE" data-name="Captain Hook b2b Ace Ventura" data-start="9.5" data-time="23:30–01:00" data-color="#B37FC4" style="grid-column:39 / 45; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Captain Hook b2b Ace Ventura</span>
+          <span class="ev-time">23:30–01:00</span>
+        </div>
+        <div class="event" data-id="s3-e6" data-default-liked="false" data-stage="ARTCORE" data-name="Alignment" data-start="11" data-time="01:00–02:30" data-color="#B37FC4" style="grid-column:45 / 51; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Alignment</span>
+          <span class="ev-time">01:00–02:30</span>
+        </div>
+        <div class="event" data-id="s3-e7" data-default-liked="false" data-stage="ARTCORE" data-name="Indira Paganotto" data-start="12.5" data-time="02:30–04:30" data-color="#B37FC4" style="grid-column:51 / 59; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Indira Paganotto</span>
+          <span class="ev-time">02:30–04:30</span>
+        </div>
+        <div class="event" data-id="s3-e8" data-default-liked="false" data-stage="ARTCORE" data-name="Azyr" data-start="14.5" data-time="04:30–06:30" data-color="#B37FC4" style="grid-column:59 / 67; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Azyr</span>
+          <span class="ev-time">04:30–06:30</span>
+        </div>
+        <div class="event" data-id="s3-e9" data-default-liked="false" data-stage="ARTCORE" data-name="BIIA" data-start="16.5" data-time="06:30–08:30" data-color="#B37FC4" style="grid-column:67 / 75; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>BIIA</span>
+          <span class="ev-time">06:30–08:30</span>
+        </div>
+        <div class="event" data-id="s3-e10" data-default-liked="false" data-stage="ARTCORE" data-name="Paolo Ferrara" data-start="18.5" data-time="08:30–10:00" data-color="#B37FC4" style="grid-column:75 / 81; --stage-color:#B37FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Paolo Ferrara</span>
+          <span class="ev-time">08:30–10:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#6E9FC4;"><span class="dot"></span>AWAKENINGS</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s4-e0" data-default-liked="false" data-stage="AWAKENINGS" data-name="Lobster" data-start="2" data-time="16:00–17:30" data-color="#6E9FC4" style="grid-column:9 / 15; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Lobster</span>
+          <span class="ev-time">16:00–17:30</span>
+        </div>
+        <div class="event" data-id="s4-e1" data-default-liked="false" data-stage="AWAKENINGS" data-name="Temudo" data-start="3.5" data-time="17:30–19:00" data-color="#6E9FC4" style="grid-column:15 / 21; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Temudo</span>
+          <span class="ev-time">17:30–19:00</span>
+        </div>
+        <div class="event" data-id="s4-e2" data-default-liked="false" data-stage="AWAKENINGS" data-name="Ignez" data-start="5" data-time="19:00–20:30" data-color="#6E9FC4" style="grid-column:21 / 27; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Ignez</span>
+          <span class="ev-time">19:00–20:30</span>
+        </div>
+        <div class="event" data-id="s4-e3" data-default-liked="false" data-stage="AWAKENINGS" data-name="Überkikz" data-start="6.5" data-time="20:30–22:00" data-color="#6E9FC4" style="grid-column:27 / 33; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Überkikz</span>
+          <span class="ev-time">20:30–22:00</span>
+        </div>
+        <div class="event" data-id="s4-e4" data-default-liked="false" data-stage="AWAKENINGS" data-name="Estella Boersma" data-start="8" data-time="22:00–23:30" data-color="#6E9FC4" style="grid-column:33 / 39; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Estella Boersma</span>
+          <span class="ev-time">22:00–23:30</span>
+        </div>
+        <div class="event" data-id="s4-e5" data-default-liked="false" data-stage="AWAKENINGS" data-name="Setaoc Mass b2b Rene Wise" data-start="9.5" data-time="23:30–01:00" data-color="#6E9FC4" style="grid-column:39 / 45; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Setaoc Mass b2b Rene Wise</span>
+          <span class="ev-time">23:30–01:00</span>
+        </div>
+        <div class="event" data-id="s4-e6" data-default-liked="false" data-stage="AWAKENINGS" data-name="Alarico b2b Yanamaste" data-start="11" data-time="01:00–03:00" data-color="#6E9FC4" style="grid-column:45 / 53; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Alarico b2b Yanamaste</span>
+          <span class="ev-time">01:00–03:00</span>
+        </div>
+        <div class="event" data-id="s4-e7" data-default-liked="false" data-stage="AWAKENINGS" data-name="Ben Klock b2b SHDW" data-start="13" data-time="03:00–04:30" data-color="#6E9FC4" style="grid-column:53 / 59; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Ben Klock b2b SHDW</span>
+          <span class="ev-time">03:00–04:30</span>
+        </div>
+        <div class="event" data-id="s4-e8" data-default-liked="false" data-stage="AWAKENINGS" data-name="Ben Sims b2b Adriana Lopez" data-start="14.5" data-time="04:30–06:30" data-color="#6E9FC4" style="grid-column:59 / 67; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Ben Sims b2b Adriana Lopez</span>
+          <span class="ev-time">04:30–06:30</span>
+        </div>
+        <div class="event" data-id="s4-e9" data-default-liked="false" data-stage="AWAKENINGS" data-name="fumi" data-start="16.5" data-time="06:30–08:00" data-color="#6E9FC4" style="grid-column:67 / 73; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>fumi</span>
+          <span class="ev-time">06:30–08:00</span>
+        </div>
+        <div class="event" data-id="s4-e10" data-default-liked="false" data-stage="AWAKENINGS" data-name="DJ Pepo" data-start="18" data-time="08:00–10:00" data-color="#6E9FC4" style="grid-column:73 / 81; --stage-color:#6E9FC4;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>DJ Pepo</span>
+          <span class="ev-time">08:00–10:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#D9704F;"><span class="dot"></span>ELROW</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s5-e0" data-default-liked="false" data-stage="ELROW" data-name="Toni Varga" data-start="2" data-time="16:00–17:30" data-color="#D9704F" style="grid-column:9 / 15; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Toni Varga</span>
+          <span class="ev-time">16:00–17:30</span>
+        </div>
+        <div class="event" data-id="s5-e1" data-default-liked="false" data-stage="ELROW" data-name="Olive F" data-start="3.5" data-time="17:30–19:00" data-color="#D9704F" style="grid-column:15 / 21; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Olive F</span>
+          <span class="ev-time">17:30–19:00</span>
+        </div>
+        <div class="event" data-id="s5-e2" data-default-liked="false" data-stage="ELROW" data-name="De La Swing" data-start="5" data-time="19:00–20:30" data-color="#D9704F" style="grid-column:21 / 27; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>De La Swing</span>
+          <span class="ev-time">19:00–20:30</span>
+        </div>
+        <div class="event" data-id="s5-e3" data-default-liked="false" data-stage="ELROW" data-name="Manda Moor" data-start="6.5" data-time="20:30–22:00" data-color="#D9704F" style="grid-column:27 / 33; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Manda Moor</span>
+          <span class="ev-time">20:30–22:00</span>
+        </div>
+        <div class="event" data-id="s5-e4" data-default-liked="false" data-stage="ELROW" data-name="Bastian Bux" data-start="8" data-time="22:00–23:30" data-color="#D9704F" style="grid-column:33 / 39; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Bastian Bux</span>
+          <span class="ev-time">22:00–23:30</span>
+        </div>
+        <div class="event" data-id="s5-e5" data-default-liked="false" data-stage="ELROW" data-name="Fleur Shore" data-start="9.5" data-time="23:30–01:30" data-color="#D9704F" style="grid-column:39 / 47; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Fleur Shore</span>
+          <span class="ev-time">23:30–01:30</span>
+        </div>
+        <div class="event" data-id="s5-e6" data-default-liked="false" data-stage="ELROW" data-name="Paco Osuna" data-start="11.5" data-time="01:30–03:00" data-color="#D9704F" style="grid-column:47 / 53; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Paco Osuna</span>
+          <span class="ev-time">01:30–03:00</span>
+        </div>
+        <div class="event" data-id="s5-e7" data-default-liked="false" data-stage="ELROW" data-name="Seth Troxler" data-start="13" data-time="03:00–04:30" data-color="#D9704F" style="grid-column:53 / 59; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Seth Troxler</span>
+          <span class="ev-time">03:00–04:30</span>
+        </div>
+        <div class="event" data-id="s5-e8" data-default-liked="false" data-stage="ELROW" data-name="Chelina Manuhutu B2B Tini Gessler" data-start="14.5" data-time="04:30–06:00" data-color="#D9704F" style="grid-column:59 / 65; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Chelina Manuhutu B2B Tini Gessler</span>
+          <span class="ev-time">04:30–06:00</span>
+        </div>
+        <div class="event" data-id="s5-e9" data-default-liked="false" data-stage="ELROW" data-name="Marco Faraone" data-start="16" data-time="06:00–08:00" data-color="#D9704F" style="grid-column:65 / 73; --stage-color:#D9704F;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Marco Faraone</span>
+          <span class="ev-time">06:00–08:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#8FA85E;"><span class="dot"></span>UNREAL</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s6-e0" data-default-liked="false" data-stage="UNREAL" data-name="Alba Franch" data-start="2" data-time="16:00–18:00" data-color="#8FA85E" style="grid-column:9 / 17; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Alba Franch</span>
+          <span class="ev-time">16:00–18:00</span>
+        </div>
+        <div class="event" data-id="s6-e1" data-default-liked="false" data-stage="UNREAL" data-name="Johannes Schuster" data-start="4" data-time="18:00–19:30" data-color="#8FA85E" style="grid-column:17 / 23; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Johannes Schuster</span>
+          <span class="ev-time">18:00–19:30</span>
+        </div>
+        <div class="event" data-id="s6-e2" data-default-liked="false" data-stage="UNREAL" data-name="Afem Syko" data-start="5.5" data-time="19:30–21:00" data-color="#8FA85E" style="grid-column:23 / 29; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Afem Syko</span>
+          <span class="ev-time">19:30–21:00</span>
+        </div>
+        <div class="event" data-id="s6-e3" data-default-liked="false" data-stage="UNREAL" data-name="Cloudy" data-start="7" data-time="21:00–22:30" data-color="#8FA85E" style="grid-column:29 / 35; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Cloudy</span>
+          <span class="ev-time">21:00–22:30</span>
+        </div>
+        <div class="event" data-id="s6-e4" data-default-liked="false" data-stage="UNREAL" data-name="Cera Khin" data-start="8.5" data-time="22:30–00:00" data-color="#8FA85E" style="grid-column:35 / 41; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Cera Khin</span>
+          <span class="ev-time">22:30–00:00</span>
+        </div>
+        <div class="event" data-id="s6-e5" data-default-liked="false" data-stage="UNREAL" data-name="PRADA2000" data-start="10" data-time="00:00–01:30" data-color="#8FA85E" style="grid-column:41 / 47; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>PRADA2000</span>
+          <span class="ev-time">00:00–01:30</span>
+        </div>
+        <div class="event" data-id="s6-e6" data-default-liked="false" data-stage="UNREAL" data-name="Brutalismus 3000" data-start="11.5" data-time="01:30–02:30" data-color="#8FA85E" style="grid-column:47 / 51; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Brutalismus 3000</span>
+          <span class="ev-time">01:30–02:30</span>
+        </div>
+        <div class="event" data-id="s6-e7" data-default-liked="false" data-stage="UNREAL" data-name="Kuko" data-start="12.5" data-time="02:30–04:00" data-color="#8FA85E" style="grid-column:51 / 57; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Kuko</span>
+          <span class="ev-time">02:30–04:00</span>
+        </div>
+        <div class="event" data-id="s6-e8" data-default-liked="false" data-stage="UNREAL" data-name="Vendex" data-start="14" data-time="04:00–05:30" data-color="#8FA85E" style="grid-column:57 / 63; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Vendex</span>
+          <span class="ev-time">04:00–05:30</span>
+        </div>
+        <div class="event" data-id="s6-e9" data-default-liked="false" data-stage="UNREAL" data-name="Dyen" data-start="15.5" data-time="05:30–07:00" data-color="#8FA85E" style="grid-column:63 / 69; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Dyen</span>
+          <span class="ev-time">05:30–07:00</span>
+        </div>
+        <div class="event" data-id="s6-e10" data-default-liked="false" data-stage="UNREAL" data-name="Fatima Hajji" data-start="17" data-time="07:00–08:30" data-color="#8FA85E" style="grid-column:69 / 75; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Fatima Hajji</span>
+          <span class="ev-time">07:00–08:30</span>
+        </div>
+        <div class="event" data-id="s6-e11" data-default-liked="false" data-stage="UNREAL" data-name="Fantasm" data-start="18.5" data-time="08:30–10:00" data-color="#8FA85E" style="grid-column:75 / 81; --stage-color:#8FA85E;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Fantasm</span>
+          <span class="ev-time">08:30–10:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#9A8C98;"><span class="dot"></span>TECHNO CATHEDRAL</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event" data-id="s7-e0" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Indira Paganotto" data-start="0" data-time="14:00–16:00" data-color="#9A8C98" style="grid-column:1 / 9; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Indira Paganotto</span>
+          <span class="ev-time">14:00–16:00</span>
+        </div>
+        <div class="event" data-id="s7-e1" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Aerea (Live)" data-start="2" data-time="16:00–17:30" data-color="#9A8C98" style="grid-column:9 / 15; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Aerea (Live)</span>
+          <span class="ev-time">16:00–17:30</span>
+        </div>
+        <div class="event" data-id="s7-e2" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Adiel b2b Quest" data-start="3.5" data-time="17:30–19:00" data-color="#9A8C98" style="grid-column:15 / 21; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Adiel b2b Quest</span>
+          <span class="ev-time">17:30–19:00</span>
+        </div>
+        <div class="event" data-id="s7-e3" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Marco Faraone" data-start="5" data-time="19:00–20:30" data-color="#9A8C98" style="grid-column:21 / 27; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Marco Faraone</span>
+          <span class="ev-time">19:00–20:30</span>
+        </div>
+        <div class="event" data-id="s7-e4" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Len Faki" data-start="6.5" data-time="20:30–22:00" data-color="#9A8C98" style="grid-column:27 / 33; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Len Faki</span>
+          <span class="ev-time">20:30–22:00</span>
+        </div>
+        <div class="event" data-id="s7-e5" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Chlär" data-start="8" data-time="22:00–23:30" data-color="#9A8C98" style="grid-column:33 / 39; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Chlär</span>
+          <span class="ev-time">22:00–23:30</span>
+        </div>
+        <div class="event" data-id="s7-e6" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Ben Sims" data-start="9.5" data-time="23:30–01:00" data-color="#9A8C98" style="grid-column:39 / 45; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Ben Sims</span>
+          <span class="ev-time">23:30–01:00</span>
+        </div>
+        <div class="event" data-id="s7-e7" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Patrick Mason" data-start="11" data-time="01:00–02:30" data-color="#9A8C98" style="grid-column:45 / 51; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Patrick Mason</span>
+          <span class="ev-time">01:00–02:30</span>
+        </div>
+        <div class="event" data-id="s7-e8" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Clara Cuvé" data-start="12.5" data-time="02:30–04:00" data-color="#9A8C98" style="grid-column:51 / 57; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Clara Cuvé</span>
+          <span class="ev-time">02:30–04:00</span>
+        </div>
+        <div class="event liked" data-id="s7-e9" data-default-liked="true" data-stage="TECHNO CATHEDRAL" data-name="Andres Campo" data-start="14" data-time="04:00–06:00" data-color="#9A8C98" style="grid-column:57 / 65; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart">&#9829;</span>Andres Campo</span>
+          <span class="ev-time">04:00–06:00</span>
+        </div>
+        <div class="event liked" data-id="s7-e10" data-default-liked="true" data-stage="TECHNO CATHEDRAL" data-name="Joseph Capriati" data-start="16" data-time="06:00–08:00" data-color="#9A8C98" style="grid-column:65 / 73; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart">&#9829;</span>Joseph Capriati</span>
+          <span class="ev-time">06:00–08:00</span>
+        </div>
+        <div class="event" data-id="s7-e11" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Amelie Lens" data-start="18" data-time="08:00–10:00" data-color="#9A8C98" style="grid-column:73 / 81; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Amelie Lens</span>
+          <span class="ev-time">08:00–10:00</span>
+        </div>
+        <div class="event" data-id="s7-e12" data-default-liked="false" data-stage="TECHNO CATHEDRAL" data-name="Richie Hawtin" data-start="20" data-time="10:00–12:00" data-color="#9A8C98" style="grid-column:81 / 89; --stage-color:#9A8C98;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Richie Hawtin</span>
+          <span class="ev-time">10:00–12:00</span>
+        </div>
+    </div>
+    <div class="stage-label" style="--stage-color:#4F6D9A;"><span class="dot"></span>OUTWORLD</div>
+    <div class="track" style="grid-template-columns: repeat(88, minmax(var(--col-w),1fr));">
+      
+        <div class="event liked" data-id="s8-e0" data-default-liked="true" data-stage="OUTWORLD" data-name="Klangkuenstler (Hardgroove Set)" data-start="6" data-time="20:00–21:30" data-color="#4F6D9A" style="grid-column:25 / 31; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart">&#9829;</span>Klangkuenstler (Hardgroove Set)</span>
+          <span class="ev-time">20:00–21:30</span>
+        </div>
+        <div class="event" data-id="s8-e1" data-default-liked="false" data-stage="OUTWORLD" data-name="David Moleon" data-start="7.5" data-time="21:30–23:00" data-color="#4F6D9A" style="grid-column:31 / 37; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>David Moleon</span>
+          <span class="ev-time">21:30–23:00</span>
+        </div>
+        <div class="event" data-id="s8-e2" data-default-liked="false" data-stage="OUTWORLD" data-name="Felicie b2b Luxi Villar" data-start="9" data-time="23:00–00:30" data-color="#4F6D9A" style="grid-column:37 / 43; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Felicie b2b Luxi Villar</span>
+          <span class="ev-time">23:00–00:30</span>
+        </div>
+        <div class="event" data-id="s8-e3" data-default-liked="false" data-stage="OUTWORLD" data-name="Future.666 b2b Aerea (DJ set)" data-start="10.5" data-time="00:30–02:00" data-color="#4F6D9A" style="grid-column:43 / 49; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Future.666 b2b Aerea (DJ set)</span>
+          <span class="ev-time">00:30–02:00</span>
+        </div>
+        <div class="event" data-id="s8-e4" data-default-liked="false" data-stage="OUTWORLD" data-name="Chris Liebing b2b Speedy J" data-start="12" data-time="02:00–03:30" data-color="#4F6D9A" style="grid-column:49 / 55; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Chris Liebing b2b Speedy J</span>
+          <span class="ev-time">02:00–03:30</span>
+        </div>
+        <div class="event" data-id="s8-e5" data-default-liked="false" data-stage="OUTWORLD" data-name="Dax J b2b Daria Kolosova" data-start="13.5" data-time="03:30–05:00" data-color="#4F6D9A" style="grid-column:55 / 61; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Dax J b2b Daria Kolosova</span>
+          <span class="ev-time">03:30–05:00</span>
+        </div>
+        <div class="event" data-id="s8-e6" data-default-liked="false" data-stage="OUTWORLD" data-name="Klangkuenstler (Schranz Set)" data-start="15" data-time="05:00–07:00" data-color="#4F6D9A" style="grid-column:61 / 69; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Klangkuenstler (Schranz Set)</span>
+          <span class="ev-time">05:00–07:00</span>
+        </div>
+        <div class="event" data-id="s8-e7" data-default-liked="false" data-stage="OUTWORLD" data-name="Svetec B2B O.B.I. (Old School Set)" data-start="17" data-time="07:00–08:30" data-color="#4F6D9A" style="grid-column:69 / 75; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Svetec B2B O.B.I. (Old School Set)</span>
+          <span class="ev-time">07:00–08:30</span>
+        </div>
+        <div class="event" data-id="s8-e8" data-default-liked="false" data-stage="OUTWORLD" data-name="PERC" data-start="18.5" data-time="08:30–10:00" data-color="#4F6D9A" style="grid-column:75 / 81; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>PERC</span>
+          <span class="ev-time">08:30–10:00</span>
+        </div>
+        <div class="event" data-id="s8-e9" data-default-liked="false" data-stage="OUTWORLD" data-name="Héctor Oaks" data-start="20" data-time="10:00–12:00" data-color="#4F6D9A" style="grid-column:81 / 89; --stage-color:#4F6D9A;" onclick="toggleFav(this)">
+          <span class="ev-name"><span class="heart" style="display:none">&#9829;</span>Héctor Oaks</span>
+          <span class="ev-time">10:00–12:00</span>
+        </div>
+    </div>
+    </div>
+  </div>
+
+  <footer>DATOS EXTRAÍDOS DE TUS CAPTURAS · EL PAJAR · EL CORRAL · INDUSTRY CITY 240 F2F · ARTCORE · AWAKENINGS · ELROW · UNREAL · TECHNO CATHEDRAL · OUTWORLD</footer>
+</div>
+
+<div id="itinerary-panel" class="itinerary-panel">
+  <div class="itinerary-header" onclick="toggleItinerary()">
+    <span class="itinerary-title"><span class="heart">&#9829;</span> Mi itinerario <span id="itin-count">(0)</span></span>
+    <span class="itinerary-chevron">▲</span>
+  </div>
+  <div id="itinerary-list" class="itinerary-list">
+    <div class="itin-empty">Aún no has marcado ningún favorito. Toca un set en el calendario para añadirlo aquí.</div>
+  </div>
+</div>
+
+<script>
+  var STORAGE_KEY = 'monegros_favs_v1';
+
+  function loadFavs() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveFavs(favsObj) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(favsObj));
+    } catch (e) { /* storage unavailable, ignore */ }
+  }
+
+  function applyState(el, liked) {
+    var heart = el.querySelector('.heart');
+    if (liked) {
+      el.classList.add('liked');
+      if (heart) heart.style.display = 'inline';
+    } else {
+      el.classList.remove('liked');
+      if (heart) heart.style.display = 'none';
+    }
+  }
+
+  function renderItinerary() {
+    var likedEls = Array.prototype.slice.call(document.querySelectorAll('.event.liked'));
+    var countEl = document.getElementById('itin-count');
+    var listEl = document.getElementById('itinerary-list');
+    countEl.textContent = '(' + likedEls.length + ')';
+
+    if (likedEls.length === 0) {
+      listEl.innerHTML = '<div class="itin-empty">Aún no has marcado ningún favorito. Toca un set en el calendario para añadirlo aquí.</div>';
+      return;
+    }
+
+    likedEls.sort(function(a, b) {
+      return parseFloat(a.getAttribute('data-start')) - parseFloat(b.getAttribute('data-start'));
+    });
+
+    var html = '';
+    likedEls.forEach(function(el) {
+      var stage = el.getAttribute('data-stage');
+      var name = el.getAttribute('data-name');
+      var time = el.getAttribute('data-time');
+      var color = el.getAttribute('data-color');
+      html += '<div class="itin-row">' +
+                '<span class="itin-time">' + time + '</span>' +
+                '<span class="itin-dot" style="background:' + color + '"></span>' +
+                '<span class="itin-info"><span class="itin-name">' + name + '</span>' +
+                '<span class="itin-stage">' + stage + '</span></span>' +
+              '</div>';
+    });
+    listEl.innerHTML = html;
+  }
+
+  function toggleFav(el) {
+    var id = el.getAttribute('data-id');
+    var isLiked = el.classList.contains('liked');
+    var newState = !isLiked;
+    applyState(el, newState);
+
+    var favs = loadFavs();
+    if (!favs) favs = {};
+    favs[id] = newState;
+    saveFavs(favs);
+    renderItinerary();
+  }
+
+  function resetFavs() {
+    if (!confirm('¿Borrar todos los favoritos marcados?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    document.querySelectorAll('.event').forEach(function(el) {
+      var defaultLiked = el.getAttribute('data-default-liked') === 'true';
+      applyState(el, defaultLiked);
+    });
+    renderItinerary();
+  }
+
+  function toggleItinerary() {
+    document.getElementById('itinerary-panel').classList.toggle('collapsed');
+  }
+
+  (function init() {
+    var favs = loadFavs();
+    document.querySelectorAll('.event').forEach(function(el) {
+      var id = el.getAttribute('data-id');
+      var defaultLiked = el.getAttribute('data-default-liked') === 'true';
+      var liked = defaultLiked;
+      if (favs && Object.prototype.hasOwnProperty.call(favs, id)) {
+        liked = favs[id];
+      }
+      applyState(el, liked);
+    });
+    renderItinerary();
+  })();
+</script>
+</body>
+</html>
